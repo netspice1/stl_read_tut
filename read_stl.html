@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>STL File Reader</title>
+		<meta charset="utf-8">
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script>
+		<script src="three.min.js"></script>
+
+	</head>
+	<body>	
+	
+	<input id="fileread" type="file" />
+
+		<script>
+
+			function readSTLFile(evt) {
+      			
+				var f = evt.target.files[0]; 
+							
+				if (f) {
+					
+					var r = new FileReader();
+					
+					//onload handler
+					r.onload = function(e) { 
+						var contents = e.target.result;
+						var buffer = r.result;	
+						
+						var nTriBuff = buffer.slice(80,84);
+						var nTriView = new Uint32Array(nTriBuff);					
+						var nTri = nTriView[0];
+
+						for(var i = 0; i < nTri; i++){
+							 
+							var triBuff = buffer.slice( 84 + i*50,
+								84 + (i+1)*50 - 2); //last 2 bytes are not a float         
+								 
+							var triFloatBuff = new Float32Array(triBuff);      
+							 
+							//normal would be read here    
+							 
+							var p1 = new THREE.Vector3(triFloatBuff[3],
+								triFloatBuff[4],triFloatBuff[5]);
+								 
+							var p2 = new THREE.Vector3(triFloatBuff[6],
+								triFloatBuff[7],triFloatBuff[8]);
+								 
+							var p3 = new THREE.Vector3(triFloatBuff[9],
+								triFloatBuff[10],triFloatBuff[11]);
+						 
+							console.log(p1,p2,p3);
+						}
+					}
+
+					r.readAsArrayBuffer(f);
+					
+				} else { 
+				  alert("Failed to load file");
+				}
+							
+			}
+			
+			$( "#fileread" ).change(function(e) {
+				readSTLFile(e);
+			});		
+
+		</script>
+
+	</body>
+</html>
